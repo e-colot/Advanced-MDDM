@@ -1,1 +1,59 @@
-lab 1
+\chapter{Lab 1: RLS with forgetting factor}
+
+\section{Main steps}
+
+\begin{enumerate}
+    \item Measure the input and output signals from the DUT. The input is arbitrary and the system is time varying.
+    \item 
+\end{enumerate}
+
+\section{Time-varying RLS estimation}
+
+The system's equation can be rewritten in a vector form as follows:
+
+\begin{align*}
+    y(N) &= b_0(N) u(N) + b_1(N) u(N-1) - a_1(N) y(N-1) - a_2(N) y(N-2) \\
+    &= K(N) \theta(N)
+\end{align*}
+
+with
+\begin{align*}
+    K(N) = \begin{bmatrix} u(N) & u(N-1) & -y(N-1) & -y(N-2) \end{bmatrix}, \hspace{2cm}
+    \theta(N) = \begin{bmatrix} b_0(N) \\ b_1(N) \\ a_1(N) \\ a_2(N) \end{bmatrix}
+\end{align*}
+
+The first estimate for $\theta$ and $P$ are determined using a least squares approach on the first 200 samples. The RLS is then applied to the rest of the data. \\
+The Matlab code is given below:
+\begin{lstlisting}[language=Matlab, basicstyle=\ttfamily\footnotesize, keywordstyle=\color{blue}, commentstyle=\color{darkerGreen}, stringstyle=\color{red}]
+% initialization with an LLS estimate over a few of the first samples
+% y_lls = H * theta
+H = zeros(sampleForLLS - max(na, nb), na + nb + 1);
+for uCol = 0:nb
+    H(:, uCol + 1) = u((max(na, nb) + 1 - uCol:sampleForLLS - uCol));
+end
+for yCol = 1:na
+    H(:, nb + 1 + yCol) = -y((max(na, nb) + 1 - yCol:sampleForLLS - yCol));
+end
+y_lls = y((max(na, nb) + 1:sampleForLLS));
+
+theta = H\y_lls;
+P = inv(H'*H);
+
+theta_sav = zeros(na + nb + 1, N - max(na, nb) + 2);
+P_diag_sav = zeros(na + nb + 1, N - max(na, nb) + 2);
+
+for itr = sampleForLLS+1:N
+
+    % saving previous values
+    theta_sav(:, itr - max(na, nb) + 1) = theta;
+    P_diag_sav(:, itr - max(na, nb) + 1) = diag(P);
+
+    K_itr = [u(itr - (0:nb)), -y(itr - (1:na))];
+
+    theta = theta - (P * (K_itr') * (K_itr * theta - y(itr))) / (g + K_itr * P * (K_itr'));
+    P = 1/g * (P - (P * (K_itr') * K_itr * P) / (g + K_itr * P * (K_itr')));
+
+end
+\end{lstlisting}
+
+
