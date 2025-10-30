@@ -3,13 +3,15 @@
 \section{Main steps}
 
 \begin{enumerate}
-    \item Measure the input and output signals from the DUT. The input is arbitrary and the system is time varying.
-    \item 
+    \item Measure the input and output signals from the DUT. The input is arbitrary and the time varying part of the system is due to a manual switch.
+    \item Make a first estimate of the parameters with an LLS estimator
+    \item Use the RLS estimator with forgetting factor to track the time-varying parameters of the system.
+    \item Deduce from the estimated parameters the time instants at which the system changes.
 \end{enumerate}
 
 \section{Time-varying RLS estimation}
 
-The system's equation can be rewritten in a vector form as follows:
+Starting from the recursive equation of the system, a matrix formulation is derived:
 
 \begin{align*}
     y(N) &= b_0(N) u(N) + b_1(N) u(N-1) - a_1(N) y(N-1) - a_2(N) y(N-2) \\
@@ -18,12 +20,38 @@ The system's equation can be rewritten in a vector form as follows:
 
 with
 \begin{align*}
-    K(N) = \begin{bmatrix} u(N) & u(N-1) & -y(N-1) & -y(N-2) \end{bmatrix}, \hspace{2cm}
+    K(N) = \begin{bmatrix} u(N) & u(N-1) & -y(N-1) & -y(N-2) \end{bmatrix}, \hspace{1cm}
     \theta(N) = \begin{bmatrix} b_0(N) \\ b_1(N) \\ a_1(N) \\ a_2(N) \end{bmatrix}
 \end{align*}
 
-The first estimate for $\theta$ and $P$ are determined using a least squares approach on the first 200 samples. The RLS is then applied to the rest of the data. \\
-The Matlab code is given below:
+The RLS estimator (with forgetting factor) is a recursive algorithm that computes the parameters $\theta (N)$ and their covariance matrix $K_N$ after each new sample is collected. Because it is recursive, it needs to be initialized and this is done with a linear least squares estimate on a few first samples. \\
+The linear least squares estimator, used to find $\theta$ in $y_{\text{lls}} = H \theta$, is in our case constructed as follows:
+
+\begin{align*}
+    H = \begin{bmatrix}
+    u(n_{\text{start}} + 1) & u(n_{\text{start}}) & -y(n_{\text{start}}) & -y(n_{\text{start}} - 1) \\
+    u(n_{\text{start}} + 2) & u(n_{\text{start}} + 1) & -y(n_{\text{start}} + 1) & -y(n_{\text{start}}) \\
+    \vdots & \vdots & \vdots & \vdots \\
+    u(n_{\text{LLS}} - 1) & u(n_{\text{LLS}} - 2) & -y(n_{\text{LLS}} - 2) & -y(n_{\text{LLS}} - 3) \\
+    \end{bmatrix}, \hspace{1cm}
+    y_{\text{lls}} = \begin{bmatrix}
+    y(n_{\text{start}} + 1) \\
+    y(n_{\text{start}} + 2) \\
+    \vdots \\
+    y(n_{\text{LLS}} - 1) \\
+    \end{bmatrix}
+\end{align*}
+
+Where $n_{\text{start}} = \max(n_a, n_b)$ and $n_{\text{LLS}}$ is the number of samples used for the LLS estimate, chosen to be 200 here.
+
+$\theta (n_{\text{LLS}})$ and $P_{n_{\text{LLS}}}$ are found with, respectively, the solution to the LLS problem and the definition of the covariance matrix in the RLS algorithm: 
+
+\begin{align*}
+    \theta (n_{\text{LLS}}) = (H^T H)^{-1} H^T y_{\text{lls}}, \hspace{1cm}
+    P_{n_{\text{LLS}}} = (H^T H)^{-1}
+\end{align*}
+
+The Matlab code of the LLS initialization is given below:
 \begin{lstlisting}[language=Matlab, basicstyle=\ttfamily\footnotesize, keywordstyle=\color{blue}, commentstyle=\color{darkerGreen}, stringstyle=\color{red}]
 % initialization with an LLS estimate over a few of the first samples
 % y_lls = H * theta
@@ -38,6 +66,16 @@ y_lls = y((max(na, nb) + 1:sampleForLLS));
 
 theta = H\y_lls;
 P = inv(H'*H);
+\end{lstlisting}
+
+The recursive least squares equations with forgetting factor $g$ are given by:
+\begin{align*}
+    \theta (N) &= \theta (N-1) - \frac{P_{N-1} K^T(N) \left[K(N) \theta (N-1) - y(N)\right]}{g + K(N) P_{N-1} K^T(N)} \\
+    P_{N} &= \frac{1}{g} \left( P_{N-1} - \frac{P_{N-1} K^T(N) K(N) P_{N-1}}{g + K(N) P_{N-1} K^T(N)} \right)
+\end{align*}
+
+The Matlab code implementing these equations is given below:
+\begin{lstlisting}[language=Matlab, basicstyle=\ttfamily\footnotesize, keywordstyle=\color{blue}, commentstyle=\color{darkerGreen}, stringstyle=\color{red}]
 
 theta_sav = zeros(na + nb + 1, N - max(na, nb) + 2);
 P_diag_sav = zeros(na + nb + 1, N - max(na, nb) + 2);
@@ -55,5 +93,23 @@ for itr = sampleForLLS+1:N
 
 end
 \end{lstlisting}
+
+\section{Results}
+
+The input of the system is not interesting to show here as it is random white noise. The evolution in time of the estimated parameters is however much more interesting:
+
+\textbf{Plot theta(g) for at least 2 experiments}
+
+\textbf{Conclude which g suits the best}
+
+From the results above, we can take as estimated parameters the values just before the switch and at then end of the experiment. Because the system consists of two LTI systems switched manually, the transfer functions of each of them can be deduced from the estimated parameters:
+
+\textbf{Show TF}
+
+\section{Conclusion}
+
+\textbf{See then}
+
+
 
 

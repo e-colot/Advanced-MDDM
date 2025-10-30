@@ -12,9 +12,11 @@ f0 = fs/N;
 nb = 1;
 na = 2;
 
-sampleForLLS = 200; % arbitrarily chosen as 50 * (nb + na)
-if sampleForLLS < max(na, nb) + 1
-    error('sampleForLLS must be greater than max(na, nb) + 1');
+n_start = max(na, nb);
+n_LLS = 200; % arbitrarily chosen as 50 * size(theta)
+
+if n_LLS < n_start + 1
+    error('n_LLS must be greater than max(na, nb) + 1');
 end
 
 %% 2. Load data
@@ -28,26 +30,26 @@ end
 
 % initialization with an LLS estimate over a few of the first samples
 % y_lls = H * theta
-H = zeros(sampleForLLS - max(na, nb), na + nb + 1);
+H = zeros(n_LLS - n_start, na + nb + 1);
 for uCol = 0:nb
-    H(:, uCol + 1) = u((max(na, nb) + 1 - uCol:sampleForLLS - uCol));
+    H(:, uCol + 1) = u((n_start + 1 - uCol:n_LLS - uCol));
 end
 for yCol = 1:na
-    H(:, nb + 1 + yCol) = -y((max(na, nb) + 1 - yCol:sampleForLLS - yCol));
+    H(:, nb + 1 + yCol) = -y((n_start + 1 - yCol:n_LLS - yCol));
 end
-y_lls = y((max(na, nb) + 1:sampleForLLS));
+y_lls = y((n_start + 1:n_LLS));
 
 theta = H\y_lls;
 P = inv(H'*H);
 
-theta_sav = zeros(na + nb + 1, N - max(na, nb) + 2);
-P_diag_sav = zeros(na + nb + 1, N - max(na, nb) + 2);
+theta_sav = zeros(na + nb + 1, N - n_start + 2);
+P_diag_sav = zeros(na + nb + 1, N - n_start + 2);
 
-for itr = sampleForLLS+1:N
+for itr = n_LLS+1:N
 
     % saving previous values
-    theta_sav(:, itr - max(na, nb) + 1) = theta;
-    P_diag_sav(:, itr - max(na, nb) + 1) = diag(P);
+    theta_sav(:, itr - n_start + 1) = theta;
+    P_diag_sav(:, itr - n_start + 1) = diag(P);
 
     K_itr = [u(itr - (0:nb)), -y(itr - (1:na))];
 
