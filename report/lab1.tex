@@ -42,6 +42,8 @@ The linear least squares estimator, used to find $\theta$ in $y_{\text{lls}} = H
     \end{bmatrix}
 \end{align*}
 
+
+
 Where $n_{\text{start}} = \max(n_a, n_b)$ and $n_{\text{LLS}}$ is the number of samples used for the LLS estimate, chosen to be 200 here.
 
 $\theta (n_{\text{LLS}})$ and $P_{n_{\text{LLS}}}$ are found with, respectively, the solution to the LLS problem and the definition of the covariance matrix in the RLS algorithm: 
@@ -104,7 +106,18 @@ The input of the system is not interesting to show here as it is random white no
 
 From the results above, we can take as estimated parameters the values just before the switch and at then end of the experiment. Because the system consists of two LTI systems switched manually, the transfer functions of each of them can be deduced from the estimated parameters:
 
-\textbf{Show TF}
+\begin{align*}
+    G_{low}(z) &= \frac{b_0 z + b_1}{z^2 + a_1 z + a_2} = \frac{0.5 z + 0.15}{z^2 - 0.4 z + 0.05} \\
+    G_{high}(z) &= \frac{b_0 z + b_1}{z^2 + a_1 z + a_2} = \frac{0.29 z + 0.27}{z^2 - 1.25 z + 0.8}
+\end{align*}
+
+and their frequency responses can be plotted as follows:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../matlab scripts/lab1/results/tf_plots.jpg}
+    \caption{Frequency responses of the two operating modes of the system}
+    \label{fig:lab1_pt3_freq_response}
+\end{figure}
 
 \section{Conclusion}
 

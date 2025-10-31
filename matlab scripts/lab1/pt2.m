@@ -7,12 +7,12 @@ N = 64e3;
 fs = 8e3;
 g_list = [0.8 0.9 0.95 0.99 0.995 0.999];
 
-f0 = fs/N;
+f0 = fs/N; % frequency resolution
 
 nb = 1;
 na = 2;
 
-n_start = max(na, nb);
+n_start = max(na, nb); % first index where estimation can start
 n_LLS = 500; % arbitrarily chosen as 50 * size(theta)
 
 if n_LLS < n_start + 1
@@ -24,7 +24,7 @@ end
 %load();
 % u = input signal (N x 1)
 % y = output signal (N x 1)
-load("results/test2.mat");
+load("results/test4.mat");
 u = Su;
 y = Sy;
 
@@ -35,10 +35,10 @@ y = Sy;
 % y_lls = H * theta
 H = zeros(n_LLS - n_start, na + nb + 1);
 for uCol = 0:nb
-    H(:, uCol + 1) = u((n_start + 1 - uCol:n_LLS - uCol));
+    H(:, uCol + 1) = u((n_start + 1 - uCol:n_LLS - uCol)); % shifting input
 end
 for yCol = 1:na
-    H(:, nb + 1 + yCol) = -y((n_start + 1 - yCol:n_LLS - yCol));
+    H(:, nb + 1 + yCol) = -y((n_start + 1 - yCol:n_LLS - yCol)); % shifting output
 end
 y_lls = y((n_start + 1:n_LLS));
 
