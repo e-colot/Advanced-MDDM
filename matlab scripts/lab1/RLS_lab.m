@@ -23,7 +23,7 @@ t = (0:N-1)'/fs;
 
 %% Load Output signal
 
-system = 1;
+system = 2;
 
 switch system
     case 1
@@ -155,8 +155,15 @@ if system == 1 | system == 2
     FRF = mean(yDFT.*conj(uDFT),2) ./ mean(uDFT.*conj(uDFT),2);
     FRF = FRF(1:Nfft/2);
     
+    b_vec = Theta_True(3:4,:);
+    a_vec = Theta_True(1:2,:);
+
+    [h_true,w_true] = freqz(b_vec,[1;a_vec], N , fs);
+
     figure;
     plot(freqaxis,db(FRF),'Linewidth',1);
+    hold on
+    plot(w_true, db(h_true), 'r--', 'LineWidth', 1.5);
     xlabel('Frequency axis (Hz)');
     ylabel('Magnitude')
 
