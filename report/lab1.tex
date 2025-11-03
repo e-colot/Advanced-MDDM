@@ -13,21 +13,21 @@
 
 Starting from the recursive equation of the system, a matrix formulation is derived:
 
-\begin{align*}
+\begin{align}
     y(N) &= b_0(N) u(N) + b_1(N) u(N-1) - a_1(N) y(N-1) - a_2(N) y(N-2) \\
     &= K(N) \theta(N)
-\end{align*}
+\end{align}
 
 with
-\begin{align*}
+\begin{align}
     K(N) = \begin{bmatrix} u(N) & u(N-1) & -y(N-1) & -y(N-2) \end{bmatrix}, \hspace{1cm}
     \theta(N) = \begin{bmatrix} b_0(N) \\ b_1(N) \\ a_1(N) \\ a_2(N) \end{bmatrix}
-\end{align*}
+\end{align}
 
 The RLS estimator (with forgetting factor) is a recursive algorithm that computes the parameters $\theta (N)$ and their covariance matrix $K_N$ after each new sample is collected. Because it is recursive, it needs to be initialized and this is done with a linear least squares estimate on a few first samples. \\
 The linear least squares estimator, used to find $\theta$ in $y_{\text{lls}} = H \theta$, is in our case constructed as follows:
 
-\begin{align*}
+\begin{align}
     H = \begin{bmatrix}
     u(n_{\text{start}} + 1) & u(n_{\text{start}}) & -y(n_{\text{start}}) & -y(n_{\text{start}} - 1) \\
     u(n_{\text{start}} + 2) & u(n_{\text{start}} + 1) & -y(n_{\text{start}} + 1) & -y(n_{\text{start}}) \\
@@ -40,7 +40,7 @@ The linear least squares estimator, used to find $\theta$ in $y_{\text{lls}} = H
     \vdots \\
     y(n_{\text{LLS}} - 1) \\
     \end{bmatrix}
-\end{align*}
+\end{align}
 
 
 
@@ -48,10 +48,10 @@ Where $n_{\text{start}} = \max(n_a, n_b)$ and $n_{\text{LLS}}$ is the number of 
 
 $\theta (n_{\text{LLS}})$ and $P_{n_{\text{LLS}}}$ are found with, respectively, the solution to the LLS problem and the definition of the covariance matrix in the RLS algorithm: 
 
-\begin{align*}
+\begin{align}
     \theta (n_{\text{LLS}}) = (H^T H)^{-1} H^T y_{\text{lls}}, \hspace{1cm}
     P_{n_{\text{LLS}}} = (H^T H)^{-1}
-\end{align*}
+\end{align}
 
 The Matlab code of the LLS initialization is given below:
 \begin{lstlisting}[language=Matlab, basicstyle=\ttfamily\footnotesize, keywordstyle=\color{blue}, commentstyle=\color{darkerGreen}, stringstyle=\color{red}]
@@ -71,10 +71,10 @@ P = inv(H'*H);
 \end{lstlisting}
 
 The recursive least squares equations with forgetting factor $g$ are given by:
-\begin{align*}
+\begin{align}
     \theta (N) &= \theta (N-1) - \frac{P_{N-1} K^T(N) \left[K(N) \theta (N-1) - y(N)\right]}{g + K(N) P_{N-1} K^T(N)} \\
     P_{N} &= \frac{1}{g} \left( P_{N-1} - \frac{P_{N-1} K^T(N) K(N) P_{N-1}}{g + K(N) P_{N-1} K^T(N)} \right)
-\end{align*}
+\end{align}
 
 The Matlab code implementing these equations is given below:
 \begin{lstlisting}[language=Matlab, basicstyle=\ttfamily\footnotesize, keywordstyle=\color{blue}, commentstyle=\color{darkerGreen}, stringstyle=\color{red}]
@@ -106,10 +106,10 @@ The input of the system is not interesting to show here as it is random white no
 
 From the results above, we can take as estimated parameters the values just before the switch and at then end of the experiment. Because the system consists of two LTI systems switched manually, the transfer functions of each of them can be deduced from the estimated parameters:
 
-\begin{align*}
+\begin{align}
     G_{low}(z) &= \frac{b_0 z + b_1}{z^2 + a_1 z + a_2} = \frac{0.5 z + 0.15}{z^2 - 0.4 z + 0.05} \\
     G_{high}(z) &= \frac{b_0 z + b_1}{z^2 + a_1 z + a_2} = \frac{0.29 z + 0.27}{z^2 - 1.25 z + 0.8}
-\end{align*}
+\end{align}
 
 and their frequency responses can be plotted as follows:
 \begin{figure}[H]
