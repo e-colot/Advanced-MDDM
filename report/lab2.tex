@@ -6,7 +6,7 @@
     \item TODO
 \end{enumerate}
 
-\section{State space model}
+\section{Continuous-time state space model}
 
 \begin{figure}[H]
     \centering
@@ -44,3 +44,64 @@ Which finally leads to:
 \begin{equation}
     \Leftrightarrow \hspace{1cm} A_c = \begin{bmatrix} 0 & \frac{1}{C_0} \\ -\frac{1}{L_0} & -\frac{R_0}{L_0} \end{bmatrix}, \hspace{1cm} B_c = \begin{bmatrix} 0 \\ \frac{1}{L_0} \end{bmatrix}, \hspace{1cm} C_c = \begin{bmatrix} 1 & 0 \end{bmatrix}, \hspace{1cm} D_c = 0
 \end{equation}
+
+\section{Discrete-time state space model}
+
+To convert this continuous-time state space model to a discrete-time one, we need to select a sampling frequency. As the poles of the system are the eigenvalues of the matrix $A_c$, we can compute them with Matlab, giving:
+
+\begin{equation}
+    \begin{cases}
+    \lambda_1 \approx -1 \text{MHz} + j 8.1\\
+    \lambda_2 \approx -1 \text{MHz} - j 8.1
+    \end{cases}
+\end{equation}
+
+The band of interest is therefore chosen to be higher than 1 MHz in order to capture the dynamics of the system. the sampling frequency is thus set to $f_s = 4$ MHz. The discrete-time state space matrices are computed with Matlab. Two different methods are used: ZOH and tustin.\\
+To compare which method is closer to the continuous-time model, the step response of the three models are plotted in Fig \ref{fig:step_response_comparison}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../matlab scripts/lab2/results/stepResponse.png}
+    \caption{Step response comparison between continuous-time model and discrete-time models obtained with ZOH and Tustin methods}
+    \label{fig:step_response_comparison}
+\end{figure}
+
+The tustin model oscillates for longer than the continuous-time model, which is not the case for the ZOH model. The ZOH model is therefore chosen for the following steps. The discrete-time state space matrices are:
+
+\begin{equation}
+A_d = \begin{bmatrix}
+-0.2560 & 28.7752 \\
+-0.0173 & -0.4286
+\end{bmatrix}, \qquad
+B_d = \begin{bmatrix}
+1.2560 \\
+0.0173
+\end{bmatrix}, \qquad
+C_d = \begin{bmatrix}
+1 & 0
+\end{bmatrix}, \qquad
+D_d = 0
+\end{equation}
+
+The poles of the discrete-time system are also computed by calculating the eigenvalues of the matrix $A_d$ and the system is stable as they are in the unit circle:
+
+\begin{equation}
+    \begin{cases}
+    p_1 \approx -0.3423 + 0.6995i\\
+    p_2 \approx -0.3423 - 0.6995i
+    \end{cases}
+\end{equation}
+
+To determine whether the system is observable, we can compute the rank of the observability matrix $\mathcal{O}$:
+
+\begin{equation}
+    \mathcal{O} = \begin{bmatrix}
+    C_d \\
+    C_d A_d
+    \end{bmatrix} = \begin{bmatrix}
+    1 & 0 \\
+    -0.2560 & 28.7752
+    \end{bmatrix}
+\end{equation}
+
+Which is of rank 2, meaning that the system is observable.
