@@ -98,26 +98,177 @@ end
 
 \section{Results}
 
-The input of the system is not interesting to show here as it is random white noise. The evolution in time of the estimated parameters is however much more interesting:
+The input of the system is not interesting to show here as it is random white noise. The evolution in time of the estimated parameters is however much more interesting.
+The following figures will display the evolution of the parameters (with their uncertainty range) for mutliple forgetting factor values and for different experiments.
+The experiments are :
 
-\textbf{Plot theta(g) for at least 2 experiments}
+\begin{enumerate}
+    \item Excitation of a LTI sub-system (namely Low LTI) - Figure ~\ref{fig:Low_LTI_para_evol}.
+    \item Excitation of the second LTI sub-system (namely High LTI) - Figure ~\ref{fig:High_LTI_para_evol}.
+    \item Excitation of both LTI systems trough a single switch - Figure ~\ref{fig:One_switch_para_evol}.
+    \item Excitation of both LTI systems trough mutliple switches - Figure ~\ref{fig:Multiple_switches_para_evol}.
+\end{enumerate}
 
-\textbf{Conclude which g suits the best}
 
-From the results above, we can take as estimated parameters the values just before the switch and at then end of the experiment. Because the system consists of two LTI systems switched manually, the transfer functions of each of them can be deduced from the estimated parameters:
-
-\begin{align}
-    G_{low}(z) &= \frac{b_0 z + b_1}{z^2 + a_1 z + a_2} = \frac{0.5 z + 0.15}{z^2 - 0.4 z + 0.05} \\
-    G_{high}(z) &= \frac{b_0 z + b_1}{z^2 + a_1 z + a_2} = \frac{0.29 z + 0.27}{z^2 - 1.25 z + 0.8}
-\end{align}
-
-and their frequency responses can be plotted as follows:
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{../matlab scripts/lab1/results/tf_plots.jpg}
-    \caption{Frequency responses of the two operating modes of the system}
-    \label{fig:lab1_pt3_freq_response}
+    \includegraphics[width=0.8\textwidth]{../pic/lab1/Low_LTI_para_evol.png}
+    \caption{Parameters evolution for multiple forgetting factors - Low LTI sub-system}
+    \label{fig:Low_LTI_para_evol}
 \end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../pic/lab1/High_LTI_para_evol.png}
+    \caption{Parameters evolution for multiple forgetting factors - High LTI sub-system}
+    \label{fig:High_LTI_para_evol}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../pic/lab1/One_switch_para_evol.png}
+    \caption{Parameters evolution for multiple forgetting factors - single switch between the two LTI systems}
+    \label{fig:One_switch_para_evol}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../pic/lab1/Multiple_switches_para_evol.png}
+    \caption{Parameters evolution for multiple forgetting factors - multiple switches between the two LTI systems}
+    \label{fig:Multiple_switches_para_evol}
+\end{figure}
+\pagebreak
+One may already observe that the uncertainty on the parameters of the LTI system named High LTI system is around 4 times
+lower than the uncertainty on the parameters for the second LTI system.\\
+Another observation is related to the reduction of the uncertainty converging to a plateau value as the time passes at the beginning of the measurement.
+This behaviour is well visible in the case of the Low LTI sub-system for a forgetting factor set at 0.9999.  The reaosn behind the uncertainty level diminution is laying in the limited
+number of samples available for the RLS algorithm at the beginning of the measurements - Figure ~\ref{fig:Uncertainty_reduction}. \\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../pic/lab1/Uncertainty_reduction.PNG}
+    \caption{Uncertainty variation during the first 500 samples - Low LTI system (g=0.9999)}
+    \label{fig:Uncertainty_reduction}
+\end{figure}
+
+As shown on the figures, the RLS algorithm with forgetting factor is a powerful tool to track the parameters of time-varying system simulated 
+in our case by switching two LTI subsystems.  Nevertheless, the choice of the forgetting factor value is dependent of the constraints or 
+specifications of our system and also the required confidence on the parameters we get once in steady-state.\\
+Let's consider our experiment with mutliple switches - One can easily see that the RLS algorithm with a forgetting factor of 0.9999 cannot
+converge fast enough and is therefore not relevant for such time-varying system.\\
+In the other hand, the other RLS algorithm with forgetting factor smaller than 0.9999 exhibits higher parameter variances leading to uncertainty much more significant (10 times higher in case of g = 0.99);
+ but also noticeable spikes at the switching instants resulting to a non-smooth evolution of the parameters. This rough evolution may result to potential issues, damages in real systems we are tracking (in case by example of RLS algorithm used for control system).
+For rigorosity, a table containing the parameters variance for the different forgetting factors is shown below - Table ~\ref{table:1} and ~\ref{table:2}. 
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{||c ||c c c c||} 
+ \hline 
+ Low LTI & $\sigma^2_\text{a1}$ & $\sigma^2_\text{a2}$ & $\sigma^2_\text{b0}$ & $\sigma^2_\text{b1}$ \\ [0.5ex] 
+ \hline\hline 
+ g=0.7 & 46.0729 & 19.1852 & 0.3077 & 13.5596 \\ 
+ \hline
+ g=0.8 & 19.5318 & 8.1543 & 0.1653 & 5.5176 \\
+ \hline
+ g=0.9 & 7.2197 & 2.7688 & 0.0767 & 1.9273 \\
+ \hline
+ g=0.95 & 3.5704 & 1.2898 & 0.0393 & 0.9333 \\
+ \hline
+ g=0.99 & 0.2875 & 0.1140 & 0.0090 & 0.0791 \\ 
+ \hline
+ g=0.9999 & 0.2385$e^{-3}$ & 0.2123$e^{-3}$ & 0.1125$e^{-3}$ & 0.1429$e^{-3}$ \\
+ \hline
+\end{tabular}
+\caption{Parameters variances in steady state for Low LTI system}
+\label{table:1}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{||c ||c c c c||} 
+ \hline 
+ High LTI & $\sigma^2_\text{a1}$ & $\sigma^2_\text{a2}$ & $\sigma^2_\text{b0}$ & $\sigma^2_\text{b1}$ \\ [0.5ex] 
+ \hline\hline
+ g=0.7 & 1.2416 & 1.4443 & 2.0137 & 2.7133 \\ 
+ \hline
+ g=0.8 & 0.5458 & 0.6222 & 0.7531 & 0.9635 \\
+ \hline
+ g=0.9 & 0.1918 & 0.1995 & 0.2014 & 0.2356 \\
+ \hline
+ g=0.95 & 0.0874 & 0.0842 & 0.0694 & 0.0798 \\
+ \hline
+ g=0.99 & 0.0204 & 0.0189 & 0.0117 & 0.0135 \\ 
+ \hline
+ g=0.9999 & 0.4765$e^{-3}$ & 0.3578$e^{-3}$ & 0.1062$e^{-3}$ & 0.1921$e^{-3}$ \\
+ \hline
+\end{tabular}
+\caption{Parameters variances in steady state for High LTI system}
+\label{table:2}
+\end{table}
+
+It remains therefore to decide the most suitable forgetting factor for our experiment with multiple switches.\\
+In our case, the forgetting factor of 0.99 was converging few hundreds of samples after the switch (~0.15 seconds) to its steady-state - fast enough to converge before the next switching and with a smooth convergence.\\
+The switching instants and the convergence of the parameters to its steady-sate is shown at the figure ~\ref{fig:convergence_99}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../pic/lab1/convergence_99.png}
+    \caption{Switching instants and convergence (g=0.99)}
+    \label{fig:convergence_99}
+\end{figure}
+
+In order to grasp the differences between the results given for different forgetting factor, it is useful to plot the transfer function modeled from
+the parameters given by the RLS algorithms and compared it at the FRF computed with the average power spectrum method from the input signal and the output measurements.
+The timing to compare the models and the FRF is choosen once the RLS algorithm with g=0.99 has reached its steady-state after a switch of system - Figure .\\
+We can easily see that RLS algorithm with forgetting factor smaller than 0.99 have reached the convergence and match the estimated FRF (which is logical as those algorithm are reacting faster than the algorithm with g=0.99).  Nevertheless, by looking carefully to the modeled transfer functions coming from RLS with forgetting factors smaller than 0.99, one can observe the models are fitting the FRF with
+a lower accuracy resulting from the higher uncertainty level on the parameters.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../pic/lab1/FRF_Multiple_switch_g_factor_99.png}
+    \caption{Comparison estimated FRF and computed model - at steady state instant for RLS with forgetting factor set at 0.99}
+    \label{fig:FRF_Multiple_switch_g_factor_99}
+\end{figure}
+
+Finally, the comparison between the estimated FRF for both LTI sub-systems and the transfer function calculated based on the parameters - computed by the RLS algorithm with 
+forgetting factor of 0.99 once the steady-state is reached - are displayed at the figure ~\ref{fig:FRF_Low_LTI_99} and ~\ref{fig:FRF_High_LTI_99}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../pic/lab1/FRF_Low_LTI_99.png}
+    \caption{Comparison estimated FRF and computed model - Low LTI system - g=0.99}
+    \label{fig:FRF_Low_LTI_99}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../pic/lab1/FRF_High_LTI_99.png}
+    \caption{Comparison estimated FRF and computed model - High LTI system - g=0.99}
+    \label{fig:FRF_High_LTI_99}
+\end{figure}
+
+%From the results above, we can take as estimated parameters the values just before the switch and at then end of the experiment. Because the system consists of two LTI systems switched manually, the transfer functions of each of them can be deduced from the estimated parameters:
+
+Finally, the mathematical expression of the transfer functions  (RLS - g=0.99 - steady-state instants) are detailed below: 
+\begin{align}
+    G_{low}(z^{-1}) &= \frac{b_0 + b_1 z^{-1}}{1 + a_1 z^{-1} + a_2 z^{-2}} = \frac{0.4874 + 0.1613 z^{-1}}{1 - 0.3763 z^{-1} + 0.0263 z^{-2}} \\
+    G_{high}(z^{-1}) &= \frac{b_0 + b_1 z^{-1}}{1 + a_1 z^{-1} + a_2 z^{-2}} = \frac{0.2871 + 0.2713 z^{-1}}{1 - 1.2378 z^{-1} + 0.7951 z^{-2}} 
+\end{align}
+
+In comparison the transfer function computed from LLS for each LTI sub-system taken separately :
+
+\begin{align}
+    G_{low-LLS}(z^{-1}) &= \frac{b_0 + b_1 z^{-1}}{1 + a_1 z^{-1} + a_2 z^{-2}} = \frac{0.4832 + 0.1752 z^{-1}}{1 - 0.3518 z^{-1} + 0.01 z^{-2}} \\
+    G_{high-LLS}(z^{-1}) &= \frac{b_0 + b_1 z^{-1}}{1 + a_1 z^{-1} + a_2 z^{-2}} = \frac{0.2884 + 0.2659 z^{-1}}{1 - 1.2419 z^{-1} + 0.7964 z^{-2}} 
+\end{align}
+
+%and their frequency responses can be plotted as follows:
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[width=0.8\textwidth]{../pic/lab1/tf_plots.jpg}
+%    \caption{Frequency responses of the two operating modes of the system}
+%    \label{fig:lab1_pt3_freq_response}
+%\end{figure}
 
 \section{Conclusion}
 
