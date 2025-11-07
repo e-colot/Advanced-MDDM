@@ -105,3 +105,25 @@ To determine whether the system is observable, we can compute the rank of the ob
 \end{equation}
 
 Which is of rank 2, meaning that the system is observable.
+
+\section{Simulink simulation}
+
+The Simulink model is shown in Fig \ref{fig:simulink_model}. The input is white Gaussian noise with zero mean and variance of 1V. There is also process noise $R_{v_{sim}}$ and measurement noise $R_{n_{sim}}$ which are respectively equal to:
+
+\begin{equation}
+    R_{v_{sim}} = \begin{bmatrix}
+    0.025 & 0 \\
+    0 & 10^{-6}
+    \end{bmatrix}, \hspace{1cm} R_{n_{sim}} = 0.0025
+\end{equation}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../matlab scripts/lab2/results/simulinkModel.png}
+    \caption{Simulink model of the discrete-time state space system}
+    \label{fig:simulink_model}
+\end{figure}
+
+\section{State estimation}
+
+

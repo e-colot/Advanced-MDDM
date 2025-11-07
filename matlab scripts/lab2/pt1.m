@@ -16,6 +16,7 @@ disp('Poles of the continuous-time system:');
 disp(poles);
 
 fs = 4e6;
+Ts = 1/fs;
 
 sysDiscreteTustin = c2d(sysContinuous, 1/fs, 'tustin');
 sysDiscreteZOH = c2d(sysContinuous, 1/fs, 'zoh');
@@ -52,3 +53,9 @@ disp('Dd = '); disp(Dd);
 
 disp('Poles of the discrete-time system (ZOH):');
 disp(eig(Ad));
+
+
+%% Simulink setup
+
+Rvsim = [0.025 0; 0 1e-6];
+Rnsim = 0.0025;
