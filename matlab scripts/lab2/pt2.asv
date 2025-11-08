@@ -1,0 +1,46 @@
+%% loads data from simulink
+
+uin = u.Data;
+yin = y.Data;
+xin = x.Data;
+
+% load system matrices
+A = Ad; B = Bd; C = Cd; D = Dd; 
+
+% load initial conditions
+x0 = [0 0];
+
+% load covariances
+Rn = Rnsim; Rv = Rvsim;
+
+
+%% State estimation
+
+% xPred computed using x(t+1) = A x(t) + B u(t)
+xPred = [x0; zeros(size(xin, 1)-1, size(xin, 2))];
+% xKalman computed using the Kalman filter
+xKalman = [x0; zeros(size(xin, 1)-1, size(xin, 2))];
+
+% Kalman gain
+K = zeros(size(xin, 1), 1);
+% covariance
+P = zeros(size(xin, 2), size(xin, 2), size(xin, 1));
+
+% high values as high uncertainty at first
+P(:, :, 1) = [100 0; 0 100];
+
+for itr = 1:size(xin, 1)-1
+
+    % prediction only
+    xPred(itr+1, :) = A * xPred(itr, :) + B * uin(itr, :);
+
+    % Kalman
+    Q = A * P(:, :, itr) * A' + Rv; % estimate covariance
+    K(itr+1) = Q * C' / (C * Q * C' + Rn);
+    P(:, :, itr+1) = (1 - K(itr+1) * C) * Q;
+
+    prediction = A * xKalman(itr, :) + B * uin(itr, :);
+    measurement = (yin(itr+1) - C*prediction - D*)
+
+end
+

@@ -126,4 +126,62 @@ The Simulink model is shown in Fig \ref{fig:simulink_model}. The input is white 
 
 \section{State estimation}
 
+The state estimation is performed in two ways: a simple prediction based on the model, and a Kalman filter. Both methods are implemented in Matlab as follows:
+\begin{lstlisting}[language=Matlab, basicstyle=\ttfamily\footnotesize, keywordstyle=\color{blue}, commentstyle=\color{darkerGreen}, stringstyle=\color{red}]
+for itr = 1:size(xin, 1)-1
+    % prediction only
+    xPred(:, itr+1) = A * xPred(:, itr+1) + B * uin(itr, :);
 
+    % Kalman
+    Q = A * P(:, :, itr) * A' + Rv; % prediction covariance
+    K(:, itr+1) = Q * C' / (C * Q * C' + Rn); % Kalman gain
+    P(:, :, itr+1) = (eye(size(A, 1)) - K(:, itr+1) * C) * Q; % updated covariance
+
+    prediction = A * xKalman(:, itr) + B * uin(itr, :);
+    measurement = (yin(itr+1) - C*prediction - D*uin(itr+1, :));
+
+    xKalman(:, itr+1) = prediction + K(:, itr+1) * measurement;
+end
+\end{lstlisting}
+
+And those state estimates are compared to the true state, obtained from the Simulink model. The results are shown in Fig \ref{fig:state_estimation}. It can be observed that the error on the state estimation is approximately $25$ dB lower when using the Kalman filter compared to the simple prediction method.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../matlab scripts/lab2/results/kalmanTrueParam.png}
+    \caption{State estimation comparison between simple prediction and Kalman filter}
+    \label{fig:state_estimation}
+\end{figure}
+
+To compare the robustness of both methods, the true parameters of the system are modified and the state estimation is performed again. Only the normalized state error plots are shown. \\
+Fig \ref{fig:state_estimation_wrong_A} shows that an error on the model (here the $A$ matrix) increases the state estimation error for both methods, but the Kalman filter still performs better than the simple prediction. \\
+The impact of a wrong initial condition $x_0$ is shown in Fig \ref{fig:state_estimation_wrong_x0}. The Kalman filter has no issue converging to the true state, while the simple prediction is significantly affected. \\
+Fig \ref{fig:state_estimation_wrong_Rv} and Fig \ref{fig:state_estimation_wrong_Rn} show the effect of wrong process and measurement noise covariances. In both cases, the estimates are not significantly affected, but the estimated standard deviation is higher than with the true parameters. It can be noted that it is $10$ dB higher, which is consistent with the fact that the covariance matrices were multiplied by $100$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../matlab scripts/lab2/results/kalmanWrongA.png}
+    \caption{State estimation comparison with $A = 2 A_{\text{true}}$}
+    \label{fig:state_estimation_wrong_A}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../matlab scripts/lab2/results/kalmanWrongX0.png}
+    \caption{State estimation comparison with $x_0 = [0.02; 0.02]$ instead of $x_0 = [0; 0]$}
+    \label{fig:state_estimation_wrong_x0}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../matlab scripts/lab2/results/kalmanWrongRv.png}
+    \caption{State estimation comparison with $R_v = 100 R_{v_{\text{true}}}$}
+    \label{fig:state_estimation_wrong_Rv}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../matlab scripts/lab2/results/kalmanWrongRn.png}
+    \caption{State estimation comparison with $R_n = 100 R_{n_{\text{true}}}$}
+    \label{fig:state_estimation_wrong_Rn}
+\end{figure}
