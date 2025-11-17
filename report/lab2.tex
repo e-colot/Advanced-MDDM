@@ -34,7 +34,21 @@ To get to the continuous-time state space representation of this circuit, we nee
     x(t) = \begin{bmatrix} x_1(t) \\ x_2(t) \end{bmatrix} = \begin{bmatrix} v_C(t) \\ i(t) \end{bmatrix}
 \end{equation}
 
+And using:
+
+\begin{equation}
+    \begin{cases}
+    
+    \frac{d V_c(t)}{dt} = \frac{i(t)}{C_0} \\
+    \frac{d i(t)}{dt}  =  - \frac{R_0}{L_0} i(t) - \frac{v_C(t)}{L_0}  + \frac{u_s(t)}{L_0}\\
+
+    \end{cases}
+\end{equation}
+
 Which finally leads to:
+
+
+    
 
 \begin{gather}
     \frac{d}{dt} \begin{bmatrix} x_1(t) \\ x_2(t) \end{bmatrix} = \begin{bmatrix} 0 & \frac{1}{C_0} \\ -\frac{1}{L_0} & -\frac{R_0}{L_0} \end{bmatrix} \begin{bmatrix} x_1(t) \\ x_2(t) \end{bmatrix} + \begin{bmatrix} 0 \\ \frac{1}{L_0} \end{bmatrix} u_s(t)\\
@@ -185,3 +199,52 @@ Fig \ref{fig:state_estimation_wrong_Rv} and Fig \ref{fig:state_estimation_wrong_
     \caption{State estimation comparison with $R_n = 100 R_{n_{\text{true}}}$}
     \label{fig:state_estimation_wrong_Rn}
 \end{figure}
+
+
+\section{Conclusions}
+
+\subsection{Which method performs better?}
+
+Method b (the Kalman filter) performs better. 
+In the experiments run from matlab the Kalman filter produces much smaller state estimation error and converges to the true state independant of the initial condition, 
+whereas the open‑loop prediction remains biased and has larger steady‑state error. 
+(In our test runs the Kalman filter reduced the estimation error by a margin on the order of tens of dB relative to the open‑loop prediction.)
+
+
+\subsection{Which method is more robust?}
+
+The Kalman filter is more robust in the presence of measurement noise and uncertain initial states: 
+it adapts its estimates using incoming measurements and reduces bias that the predictor cannot correct.
+However, the Kalman filter is sensitive to model mismatch and to incorrect tuning of the noise covariances: 
+large model errors degrade its performance (but typically it still outperforms the naive predictor). 
+
+In short, Kalman = more robust to noise and initial state, but still requires a reasonably accurate model and sensible covariance tuning.
+
+\subsection{Is there a difference in performance between the estimate of the first state (capacitor voltage) and of the second state (current) for method a? And for method b? Why?}
+
+
+
+
+\subsection{What are the effects of the covariance matrices on the Kalman gain?}
+
+The Kalman gain K depends on the covariance of the predicted state \(Q\), the measurement matrix C and the measurement noise covariance \(R_n\) via following relation
+\[
+K_{t+1} \;=\; Q_{t+1}\,C^\top\,(C\,Q_{t+1}\,C^\top + R_n)^{-1}.
+\]
+
+and where covariance on the estimated state \(P_{t+1}\) and covariance on the predicted state \(Q_{t+1}\) are computed using follwing relationships:
+\[
+P_{t+1} \;=\; (I - K_{t+1}\,C)\,Q_{t+1} 
+\]
+\[
+Q_{t+1} \;=\; A\,P_t\,A^\top + R_v.
+\]
+
+Thus, intuitively:
+\begin{itemize}
+    \item Increasing the measurement noise \(R_n\) makes the denominator larger and therefore reduces \(K\): the filter trusts the model more and the noisy measurements less.
+    \item Increasing the covariance on the predicted state \(Q\) tends to increase \(K\): larger uncertainty in the state estimate makes the filter rely more on measurements.
+    \item Increasing the process noise covariance \(R_v\) increases \(Q\) and hence increases \(K\).
+    \item Initial \(P\) affects the transient gains.
+\end{itemize}
+Edge cases: as \(R_n\to 0\) the gain tends to the (pseudo‑)inverse, while as \(R_n\to\infty\) the gain tends to zero and the filter behaves like a simple predictor.
