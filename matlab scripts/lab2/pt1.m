@@ -27,8 +27,8 @@ Cd = sysDiscreteZOH.C;
 Dd = sysDiscreteZOH.D;
 
 % step response comparison
-tc = 0:1/(20*fs):0.00001;
-td = 0:1/fs:0.00001;
+tc = 0:1/(20*fs):0.00001; % time vector for continuous system
+td = 0:1/fs:0.00001; % time vector for discrete systems
 
 [continuousStep, tc] = step(sysContinuous, tc);
 [discreteStepTustin, td] = step(sysDiscreteTustin, td);

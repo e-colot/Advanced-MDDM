@@ -22,9 +22,9 @@ xPred = [x0  zeros(size(xin, 2), size(xin, 1)-1)];
 xKalman = [x0 zeros(size(xin, 2), size(xin, 1)-1)];
 
 % Kalman gain
-K = zeros(size(xin, 2), size(xin, 1));
+K = zeros(size(xin, 2), size(xin, 1)); % 2D matrix to store Kalman gain at each time step
 % covariance
-P = zeros(size(xin, 2), size(xin, 2), size(xin, 1));
+P = zeros(size(xin, 2), size(xin, 2), size(xin, 1)); % 3D tensor to store covariance at each time step
 x1Std = zeros(size(xin, 1), 1);
 x2Std = zeros(size(xin, 1), 1);
 
