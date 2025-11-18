@@ -11,7 +11,7 @@ A = Ad; B = Bd; C = Cd; D = Dd;
 x0 = [0; 0];
 
 % load covariances
-Rn = Rnsim; Rv = 100*Rvsim;
+Rn = Rnsim; Rv = Rvsim;
 
 
 %% State estimation
@@ -34,7 +34,7 @@ P(:, :, 1) = [100 0; 0 100];
 for itr = 1:size(xin, 1)-1
 
     % prediction only
-    xPred(:, itr+1) = A * xPred(:, itr+1) + B * uin(itr, :);
+    xPred(:, itr+1) = A * xPred(:, itr) + B * uin(itr, :);
 
     % Kalman
     Q = A * P(:, :, itr) * A' + Rv; % prediction covariance
@@ -55,51 +55,51 @@ end
 
 t = 1:size(xin, 1);
 
-figure;
-% subplot(2, 2, 1);
-% plot(xin(:,1), 'k', LineWidth=1.5); hold on;
-% plot(xPred(1, :), 'b--', LineWidth=1.5);
-% plot(xKalman(1, :), 'r-.', LineWidth=1.5);
-% fill([t, fliplr(t)], [xKalman(1, :)+x1Std', fliplr(xKalman(1, :)-x1Std')], 'r', ...
-%     'FaceAlpha', 0.2, 'EdgeColor', 'none', 'HandleVisibility', 'off');
-% title('State Estimation - Position');
-% xlabel('Time step');
-% ylabel('Position');
-% legend('True Position', 'Predicted Position', 'Kalman Estimated Position');
-% xlim([1, size(xin, 1)]);
-% grid on;
+figure('Position', [100, 100, 1200, 800]);
+subplot(2, 2, 1);
+plot(xin(:,1), 'k', LineWidth=1.5); hold on;
+plot(xPred(1, :), 'b--', LineWidth=1.5);
+plot(xKalman(1, :), 'r-.', LineWidth=1.5);
+fill([t, fliplr(t)], [xKalman(1, :)+x1Std', fliplr(xKalman(1, :)-x1Std')], 'r', ...
+    'FaceAlpha', 0.2, 'EdgeColor', 'none', 'HandleVisibility', 'off');
+title('State Estimation - V_C');
+xlabel('Time step');
+ylabel('V_C');
+legend('True V_C', 'Predicted V_C', 'Kalman Estimated V_C');
+xlim([1, size(xin, 1)]);
+grid on;
 
-% subplot(2, 2, 2);
-% plot(xin(:, 2), 'k', LineWidth=1.5); hold on;
-% plot(xPred(2, :), 'b--', LineWidth=1.5);
-% plot(xKalman(2, :), 'r-.', LineWidth=1.5);
-% fill([t, fliplr(t)], [xKalman(2, :)+x2Std', fliplr(xKalman(2, :)-x2Std')], 'r', ...
-%     'FaceAlpha', 0.2, 'EdgeColor', 'none', 'HandleVisibility', 'off');
-% title('State Estimation - Velocity');
-% xlabel('Time step');
-% ylabel('Velocity');
-% legend('True Velocity', 'Predicted Velocity', 'Kalman Estimated Velocity');
-% xlim([1, size(xin, 1)]);
-% grid on;
+subplot(2, 2, 2);
+plot(xin(:, 2), 'k', LineWidth=1.5); hold on;
+plot(xPred(2, :), 'b--', LineWidth=1.5);
+plot(xKalman(2, :), 'r-.', LineWidth=1.5);
+fill([t, fliplr(t)], [xKalman(2, :)+x2Std', fliplr(xKalman(2, :)-x2Std')], 'r', ...
+    'FaceAlpha', 0.2, 'EdgeColor', 'none', 'HandleVisibility', 'off');
+title('State Estimation - I');
+xlabel('Time step');
+ylabel('I');
+legend('True I', 'Predicted I', 'Kalman Estimated I');
+xlim([1, size(xin, 1)]);
+grid on;
 
-subplot(121);
+subplot(223);
 plot(db(abs((xin(:,1)'-xPred(1,:))./rms(xin(:,1)'))), 'b', LineWidth=1.5); hold on;
 plot(db(abs((xin(:,1)'-xKalman(1, :))./rms(xin(:,1)'))), 'r', LineWidth=1.5);
 plot(db(x1Std./rms(xin(:,1)')), 'k--', LineWidth=1.5);
-title('Normalized State Error - Position');
+title('Normalized State Error - V_C');
 xlabel('Time step');
-ylabel('Position error (dB)');
+ylabel('V_C error (dB)');
 legend('Prediction Error', 'Kalman Estimation Error', 'Normalized Std Dev');
 xlim([1, size(xin, 1)]);
 grid on;
 
-subplot(122);
+subplot(224);
 plot(db(abs((xin(:,2)'-xPred(2,:))./rms(xin(:,2)'))), 'b', LineWidth=1.5); hold on;
 plot(db(abs((xin(:,2)'-xKalman(2, :))./rms(xin(:,2)'))), 'r', LineWidth=1.5);
 plot(db(x2Std./rms(xin(:,2)')), 'k--', LineWidth=1.5);
-title('Normalized State Error - Velocity');
+title('Normalized State Error - I');
 xlabel('Time step');
-ylabel('Velocity error (dB)');
+ylabel('I error (dB)');
 legend('Prediction Error', 'Kalman Estimation Error', 'Normalized Std Dev');
 xlim([1, size(xin, 1)]);
 grid on;

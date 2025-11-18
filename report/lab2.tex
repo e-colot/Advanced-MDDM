@@ -130,7 +130,7 @@ The state estimation is performed in two ways: a simple prediction based on the 
 \begin{lstlisting}[language=Matlab, basicstyle=\ttfamily\footnotesize, keywordstyle=\color{blue}, commentstyle=\color{darkerGreen}, stringstyle=\color{red}]
 for itr = 1:size(xin, 1)-1
     % prediction only
-    xPred(:, itr+1) = A * xPred(:, itr+1) + B * uin(itr, :);
+    xPred(:, itr+1) = A * xPred(:, itr) + B * uin(itr, :);
 
     % Kalman
     Q = A * P(:, :, itr) * A' + Rv; % prediction covariance
