@@ -106,7 +106,7 @@ The experiments are :
     \item Excitation of a LTI sub-system (namely Low LTI) - Figure ~\ref{fig:Low_LTI_para_evol}.
     \item Excitation of the second LTI sub-system (namely High LTI) - Figure ~\ref{fig:High_LTI_para_evol}.
     \item Excitation of both LTI systems trough a single switch - Figure ~\ref{fig:One_switch_para_evol}.
-    \item Excitation of both LTI systems trough mutliple switches - Figure ~\ref{fig:Multiple_switches_para_evol}.
+    \item Excitation of both LTI systems trough multiple switches - Figure ~\ref{fig:Multiple_switches_para_evol}.
 \end{enumerate}
 
 
@@ -147,14 +147,14 @@ number of samples available for the RLS algorithm at the beginning of the measur
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{../pic/lab1/Uncertainty_reduction.PNG}
-    \caption{Uncertainty variation during the first 500 samples - Low LTI system (g=0.9999)}
+    \caption{Uncertainty variation - Low LTI system (g=0.9999)}
     \label{fig:Uncertainty_reduction}
 \end{figure}
 
 As shown on the figures, the RLS algorithm with forgetting factor is a powerful tool to track the parameters of time-varying system simulated 
 in our case by switching two LTI subsystems.  Nevertheless, the choice of the forgetting factor value is dependent of the constraints or 
 specifications of our system and also the required confidence on the parameters we get once in steady-state.\\
-Let's consider our experiment with mutliple switches - One can easily see that the RLS algorithm with a forgetting factor of 0.9999 cannot
+Let's consider our experiment with multiple switches - One can easily see that the RLS algorithm with a forgetting factor of 0.9999 cannot
 converge fast enough and is therefore not relevant for such time-varying system.\\
 In the other hand, the other RLS algorithm with forgetting factor smaller than 0.9999 exhibits higher parameter variances leading to uncertainty much more significant (10 times higher in case of g = 0.99);
  but also noticeable spikes at the switching instants resulting to a non-smooth evolution of the parameters. This rough evolution may result to potential issues, damages in real systems we are tracking (in case by example of RLS algorithm used for control system).
