@@ -357,7 +357,7 @@ Although it is a powerful tool to track the state, Kalman filter has also limita
 
 \begin{itemize}
     \item We just discussed about how robust is the Kalman observer to the noise but this property is true if we assume that $R_v$ and $R_n$ reflect the reality.  If the noise covariances matrices are purely tuned, the observer will return biased estimates or may become unstable.
-          Also the $R_n = 100 x R_n$ simulation highlights how excessive noises levels drag the observer to behave like an open-loo^p observer.
+          Also the $R_n = 100 x R_n$ simulation highlights how excessive noises levels drag the observer to behave like an open-loop observer.
     \item The second limitation is inherent to any observers.  The observation requires \underline{observability}.  It means that states are only recoverable if they are observable from the output $y$. Additionally, an observer relies on the correctness of the state space representation ($A_d, B_d, C_d, D_d$).
           Kalman predictor cannot compensate for complete unfaithful representation to the system reality even if it shows robustness for limited mismatch ($A_d = 2 x A_d$ experiment).
 \end{itemize}
