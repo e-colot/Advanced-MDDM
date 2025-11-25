@@ -24,7 +24,7 @@ with
     \theta(N) = \begin{bmatrix} b_0(N) \\ b_1(N) \\ a_1(N) \\ a_2(N) \end{bmatrix}
 \end{align}
 
-The RLS estimator (with forgetting factor) is a recursive algorithm that computes the parameters $\theta (N)$ and their covariance matrix $K_N$ after each new sample is collected. Because it is recursive, it needs to be initialized and this is done with a linear least squares estimate on a few first samples. \\
+The RLS estimator (with forgetting factor) is a recursive algorithm that computes the parameters $\theta (N)$ and their covariance matrix $K_N$ after each new sample is collected. Because it is recursive, it needs to be initialized by a linear least squares estimate on a few first samples. \\
 The linear least squares estimator, used to find $\theta$ in $y_{\text{lls}} = H \theta$, is in our case constructed as follows:
 
 \begin{align}
@@ -99,14 +99,14 @@ end
 \section{Results}
 
 The input of the system is not interesting to show here as it is random white noise. The evolution in time of the estimated parameters is however much more interesting.
-The following figures will display the evolution of the parameters (with their uncertainty range) for mutliple forgetting factor values and for different experiments.
+The following figures will display the evolution of the parameters (with their uncertainty range) for numerous forgetting factor values and for different experiments.
 The experiments are :
 
 \begin{enumerate}
     \item Excitation of a LTI sub-system (namely Low LTI) - Figure ~\ref{fig:Low_LTI_para_evol}.
     \item Excitation of the second LTI sub-system (namely High LTI) - Figure ~\ref{fig:High_LTI_para_evol}.
-    \item Excitation of both LTI systems trough a single switch - Figure ~\ref{fig:One_switch_para_evol}.
-    \item Excitation of both LTI systems trough multiple switches - Figure ~\ref{fig:Multiple_switches_para_evol}.
+    \item Excitation of both LTI systems through a single switch - Figure ~\ref{fig:One_switch_para_evol}.
+    \item Excitation of both LTI systems through mutliple switches - Figure ~\ref{fig:Multiple_switches_para_evol}.
 \end{enumerate}
 
 
@@ -134,31 +134,31 @@ The experiments are :
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{../pic/lab1/Multiple_switches_para_evol.png}
-    \caption{Parameters evolution for multiple forgetting factors - multiple switches between the two LTI systems}
+    \caption{Parameters evolution for multiple forgetting factors - succesive switches between the two LTI systems}
     \label{fig:Multiple_switches_para_evol}
 \end{figure}
 \pagebreak
 One may already observe that the uncertainty on the parameters of the LTI system named High LTI system is around 4 times
 lower than the uncertainty on the parameters for the second LTI system.\\
-Another observation is related to the reduction of the uncertainty converging to a plateau value as the time passes at the beginning of the measurement.
-This behaviour is well visible in the case of the Low LTI sub-system for a forgetting factor set at 0.9999.  The reason behind the uncertainty level diminution is laying in the limited
-number of samples available for the RLS algorithm at the beginning of the measurements - Figure ~\ref{fig:Uncertainty_reduction}. \\
+Another important observation concerns the reduction of parameter uncertainty during the initial phase of the measurements, where the uncertainty decreases and converges to a plateau.
+This behaviour is well visible in the case of the Low LTI sub-system for a forgetting factor set at 0.9999.  The reduction in uncertainty originates from the limited
+number of samples available for the RLS algorithm at the beginning of the experiment - Figure ~\ref{fig:Uncertainty_reduction}. \\
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{../pic/lab1/Uncertainty_reduction.PNG}
-    \caption{Uncertainty variation - Low LTI system (g=0.9999)}
+    \caption{Uncertainty variation during the first 500 samples - Low LTI system (g=0.9999)}
     \label{fig:Uncertainty_reduction}
 \end{figure}
 
-As shown on the figures, the RLS algorithm with forgetting factor is a powerful tool to track the parameters of time-varying system simulated 
-in our case by switching two LTI subsystems.  Nevertheless, the choice of the forgetting factor value is dependent of the constraints or 
-specifications of our system and also the required confidence on the parameters we get once in steady-state.\\
-Let's consider our experiment with multiple switches - One can easily see that the RLS algorithm with a forgetting factor of 0.9999 cannot
-converge fast enough and is therefore not relevant for such time-varying system.\\
-In the other hand, the other RLS algorithm with forgetting factor smaller than 0.9999 exhibits higher parameter variances leading to uncertainty much more significant (10 times higher in case of g = 0.99);
+As illustrated on the figures, the RLS algorithm with forgetting factor is a powerful tool for tracking the parameters of time-varying system simulated 
+in our case by switching two LTI subsystems.  However, the algorithm performance is directly dependent on the choice of the forgetting factor value.  This value is driven by system constraints or 
+specifications, such as the acceptable convergence time or the desired confidence level in the steady-state parameter estimates.\\
+Let's consider our experiment with mutliple switches. It becomes clear that the RLS algorithm with a forgetting factor of 0.9999 cannot
+converge fast enough making it unsuitable for such time-varying system.\\
+In the other hand, RLS algorithms using smaller forgetting factor exhibit higher parameter variances leading to much larger uncertainty (10 times higher in case of g = 0.99),
  but also noticeable spikes at the switching instants resulting to a non-smooth evolution of the parameters. This rough evolution may result to potential issues, damages in real systems we are tracking (in case by example of RLS algorithm used for control system).
-For rigorousness, a table containing the parameters variance for the different forgetting factors is shown below - Table ~\ref{table:1} and ~\ref{table:2}. 
+For completeness, a table containing the parameters variance for the different forgetting factors is shown below - Table ~\ref{table:1} and ~\ref{table:2}. 
 
 \begin{table}[h!]
 \centering
@@ -206,8 +206,9 @@ For rigorousness, a table containing the parameters variance for the different f
 \label{table:2}
 \end{table}
 
-It remains therefore to decide the most suitable forgetting factor for our experiment with multiple switches.\\
-In our case, the forgetting factor of 0.99 was converging few hundreds of samples after the switch (~0.15 seconds) to its steady-state - fast enough to converge before the next switching and with a smooth convergence.\\
+It remains therefore to decide the most suitable forgetting factor for our experiment with succesive switches.\\
+In our case, the forgetting factor of 0.99 was converging few hundreds of samples after the switch (0.15 seconds) to its steady-state - fast enough to converge before the next switching and with a smooth convergence.\\
+Thus, it is a good candidate for our simulation and we will consider this factor for the rest of the report.
 The switching instants and the convergence of the parameters to its steady-sate is shown in Figure \ref{fig:convergence_99}.
 
 \begin{figure}[H]
@@ -217,10 +218,8 @@ The switching instants and the convergence of the parameters to its steady-sate 
     \label{fig:convergence_99}
 \end{figure}
 
-In order to grasp the differences between the results given for different forgetting factor, it is useful to plot the transfer function modeled from
-the parameters given by the RLS algorithms and compare it with an estimate of the FRF computed using spectral averaging. \\
-We can easily see that RLS algorithm with forgetting factor smaller than 0.99 have reached the convergence and match the estimated FRF (which is logical as those algorithm are reacting faster than the algorithm with g=0.99).  Nevertheless, by looking carefully to the modeled transfer functions coming from RLS with forgetting factors smaller than 0.99, one can observe the models are fitting the FRF with
-a lower accuracy resulting from the higher uncertainty level on the parameters.
+To better visualize the differences between forgetting factors, it is useful to plot the transfer function obtained from the RLS estimates at 150ms after switch instant - timing where our RLS candidate ($g=0.99$) converges to its steady-state - and compare it with an estimate of the FRF computed using spectral averaging technique - figure \ref{fig:FRF_Multiple_switch_g_factor_99}. \\
+RLS algorithms with $g < 0.99$ reach convergence rapidly thanks to their higher reactivity.  Nevertheless, a careful inspection of the modeled transfer functions shows that these faster algorithms reveal lower accuracy when matching the FRF which results from their higher uncertainty level on the parameters.  In the opposite, the RLS with $g=0.9999$ did not reach the steady-state and thus does not match the FRF.
 
 \begin{figure}[H]
     \centering
@@ -230,7 +229,7 @@ a lower accuracy resulting from the higher uncertainty level on the parameters.
 \end{figure}
 
 Finally, the comparison between the estimated FRF for both LTI sub-systems and the transfer function calculated based on the parameters - computed by the RLS algorithm with 
-forgetting factor of 0.99 once the steady-state is reached - are displayed in Figure \ref{fig:FRF_Low_LTI_99} and \ref{fig:FRF_High_LTI_99}
+g of 0.99 once the steady-state is reached - are displayed in Figure \ref{fig:FRF_Low_LTI_99} and \ref{fig:FRF_High_LTI_99}
 
 \begin{figure}[H]
     \centering
