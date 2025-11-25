@@ -51,9 +51,6 @@ And using:
 
 Which finally leads to:
 
-
-    
-
 \begin{gather}
     \frac{d}{dt} \begin{bmatrix} x_1(t) \\ x_2(t) \end{bmatrix} = \begin{bmatrix} 0 & \frac{1}{C_0} \\ -\frac{1}{L_0} & -\frac{R_0}{L_0} \end{bmatrix} \begin{bmatrix} x_1(t) \\ x_2(t) \end{bmatrix} + \begin{bmatrix} 0 \\ \frac{1}{L_0} \end{bmatrix} u_s(t)\\
     y(t) = \begin{bmatrix} 1 & 0 \end{bmatrix} \begin{bmatrix} x_1(t) \\ x_2(t) \end{bmatrix}
@@ -61,6 +58,7 @@ Which finally leads to:
 
 \begin{equation}
     \Leftrightarrow \hspace{1cm} A_c = \begin{bmatrix} 0 & \frac{1}{C_0} \\ -\frac{1}{L_0} & -\frac{R_0}{L_0} \end{bmatrix}, \hspace{1cm} B_c = \begin{bmatrix} 0 \\ \frac{1}{L_0} \end{bmatrix}, \hspace{1cm} C_c = \begin{bmatrix} 1 & 0 \end{bmatrix}, \hspace{1cm} D_c = 0
+    \label{eq:continuousSystem}
 \end{equation}
 
 \section{Discrete-time state space model}
@@ -69,31 +67,47 @@ To convert this continuous-time state space model to a discrete-time one, we nee
 
 \begin{equation}
     \begin{cases}
-    \lambda_1 \approx -1 \text{MHz} + j 8.1\\
-    \lambda_2 \approx -1 \text{MHz} - j 8.1
+    \lambda_1 \approx (-1 + j 8.1035) \times 10^6\\
+    \lambda_2 \approx (-1 - j 8.1035) \times 10^6
     \end{cases}
 \end{equation}
 
-The band of interest is therefore chosen to be higher than 1 MHz in order to capture the dynamics of the system. the sampling frequency is thus set to $f_s = 4$ MHz. The discrete-time state space matrices are computed with Matlab. Two different methods are used: ZOH and Tustin.\\
+The resonance frequency can be found by plotting the bode plots of the continuous-time system and finding the maximum, as shown in Fig. \ref{fig:bodeContinuous} and it gives:
+
+\begin{align}
+    \omega_r &= 8.04 \times 10^6 \text{rad/s} \\
+    f_r &\approx 1.29 \text{MHz}
+\end{align}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../matlab scripts/lab2/results/bodeContinuous.png}
+    \caption{Bode plots of the continuous-time system of eq. \ref{eq:continuousSystem}}
+    \label{fig:bodeContinuous}
+\end{figure}
+
+
+
+The band of interest is therefore chosen to be higher than $1.29$ MHz in order to capture the dynamics of the system. Considering our system being a second-order low pass system, an appropriate sampling frequency would be 10 times higher than $\omega_r$. Thus $f_s$ is set to $12.9$ MHz. The discrete-time state space matrices are computed with Matlab. Two different methods are used: ZOH and tustin.\\
 To compare which method is closer to the continuous-time model, the step response of the three models are plotted in Fig \ref{fig:step_response_comparison}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{../matlab scripts/lab2/results/stepResponse.png}
+    \includegraphics[width=0.8\textwidth]{pic/lab2/stepResponse_am.png}
     \caption{Step response comparison between continuous-time model and discrete-time models obtained with ZOH and Tustin methods}
     \label{fig:step_response_comparison}
 \end{figure}
 
-The tustin model oscillates for longer than the continuous-time model, which is not the case for the ZOH model. The ZOH model is therefore chosen for the following steps. The discrete-time state space matrices are:
+The step response shows that tustin model presents a mismatch with the continuous-time model (delay introduction in time domain), which is not the case for the ZOH model. The ZOH model is therefore chosen for the following steps. The discrete-time state space matrices are:
 
 \begin{equation}
 A_d = \begin{bmatrix}
--0.2560 & 28.7752 \\
--0.0173 & -0.4286
+0.8184 & 22.2414 \\
+-0.0133 & 0.6849
 \end{bmatrix}, \qquad
 B_d = \begin{bmatrix}
-1.2560 \\
-0.0173
+0.1816 \\
+0.0133
 \end{bmatrix}, \qquad
 C_d = \begin{bmatrix}
 1 & 0
@@ -105,8 +119,8 @@ The poles of the discrete-time system are also computed by calculating the eigen
 
 \begin{equation}
     \begin{cases}
-    p_1 \approx -0.3423 + 0.6995i\\
-    p_2 \approx -0.3423 - 0.6995i
+    p_1 \approx -0.7517 + 0.5407i\\
+    p_2 \approx -0.7517 - 0.5407i
     \end{cases}
 \end{equation}
 
@@ -118,15 +132,15 @@ To determine whether the system is observable, we can compute the rank of the ob
     C_d A_d
     \end{bmatrix} = \begin{bmatrix}
     1 & 0 \\
-    -0.2560 & 28.7752
+    0.8184 & 22.2414
     \end{bmatrix}
 \end{equation}
 
-Which is of rank 2, meaning that the system is observable.
+Which is of rank 2, meaning that the full space is observable and therefore the states can be fully reconstructed from the output measurement. Kalman filter can therefore reconstruct both states from the output.
 
 \section{Simulink simulation}
 
-The Simulink model is shown in Fig \ref{fig:simulink_model}. The input is white Gaussian noise with zero mean and variance of 1V. There is also process noise $R_{v_{sim}}$ and measurement noise $R_{n_{sim}}$ which are respectively equal to:
+The Simulink model is shown in Fig \ref{fig:simulink_model}. The input is white Gaussian noise with zero mean and variance of $1$V. There is also process noise $R_{v_{sim}}$ and measurement noise $R_{n_{sim}}$ which are respectively equal to:
 
 \begin{equation}
     R_{v_{sim}} = \begin{bmatrix}
@@ -137,7 +151,7 @@ The Simulink model is shown in Fig \ref{fig:simulink_model}. The input is white 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{../matlab scripts/lab2/results/simulinkModel.png}
+    \includegraphics[width=0.9\textwidth]{pic/lab2/simulinkModel.png}
     \caption{Simulink model of the discrete-time state space system}
     \label{fig:simulink_model}
 \end{figure}
@@ -162,55 +176,65 @@ for itr = 1:size(xin, 1)-1
 end
 \end{lstlisting}
 
-And those state estimates are compared to the true state, obtained from the Simulink model. The results are shown in Fig \ref{fig:state_estimation}. It can be observed that the error on the state estimation is approximately $25$ dB lower when using the Kalman filter compared to the simple prediction method.
+And those state estimates are compared to the true state, obtained from the Simulink model. The results are shown in Fig \ref{fig:state_estimation}. It can be observed that the error on the state estimation $V_c$ is approximately $25$ dB lower when using the Kalman filter compared to the simple prediction method (open loop observer).
+ On the other hand, the difference between the normalized error for the second state $I$ with Kalman prediction and the open loop observer is much less - around $10$dB.
+ The reason will be explained below in Sec. \ref{sec:conclusions}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{../matlab scripts/lab2/results/kalmanTrueParam.png}
+    \includegraphics[width=0.9\textwidth]{pic/lab2/kalmanTrueParam_am.png}
     \caption{State estimation comparison between simple prediction and Kalman filter}
     \label{fig:state_estimation}
 \end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{pic/lab2/kalmanTrueParam_error_am.png}
+    \caption{Normalized error comparison between simple prediction and Kalman filter}
+    \label{fig:state_estimation}
+\end{figure}
+
 To compare the robustness of both methods, the true parameters of the system are modified and the state estimation is performed again. Only the normalized state error plots are shown. \\
-On fig \ref{fig:state_estimation_wrong_A} the introduced error on the model ($A = 2 A_{\text{true}}$) makes the model unstable. The Kalman filter allows to maintain a stable state thanks to its feedback mechanism. \\
+On fig \ref{fig:state_estimation_wrong_A} the introduced error on the model ($A = 2 A_{\text{true}}$) makes the model unstable - $|\lambda| > 1$ . The Kalman filter allows to maintain a stable state thanks to its feedback mechanism (the gain K moves the eigenvalues in the Z-domain and make the observer stable). \\
 The impact of a wrong initial condition $x_0$ is shown in Fig \ref{fig:state_estimation_wrong_x0}. Both methods seem to have no significant difference compared to the case with exact initial conditions on fig \ref{fig:state_estimation}. \\
-Fig \ref{fig:state_estimation_wrong_Rv} and Fig \ref{fig:state_estimation_wrong_Rn} show the effect of wrong process and measurement noise covariances. In both cases, the estimates are not significantly affected, but the estimated standard deviation is higher than with the true parameters. 
+Fig \ref{fig:state_estimation_wrong_Rv} and Fig \ref{fig:state_estimation_wrong_Rn} show the effect of wrong process and measurement noise covariances. In both cases, the estimates are not significantly affected, but the estimated standard deviation is higher than with the true parameters. The standard deviation increase will be also discussed in Sec. \ref{sec:conclusions}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{../matlab scripts/lab2/results/kalmanWrongA.png}
+    \includegraphics[width=0.9\textwidth]{pic/lab2/kalmanWrongA_am.png}
     \caption{State estimation comparison with $A = 2 A_{\text{true}}$}
     \label{fig:state_estimation_wrong_A}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{../matlab scripts/lab2/results/kalmanWrongX0.png}
+    \includegraphics[width=0.9\textwidth]{pic/lab2/kalmanWrongX0_am.png}
     \caption{State estimation comparison with $x_0 = [0.02; 0.02]$ instead of $x_0 = [0; 0]$}
     \label{fig:state_estimation_wrong_x0}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{../matlab scripts/lab2/results/kalmanWrongRv.png}
+    \includegraphics[width=0.9\textwidth]{pic/lab2/kalmanWrongRv_am.png}
     \caption{State estimation comparison with $R_v = 100 R_{v_{\text{true}}}$}
     \label{fig:state_estimation_wrong_Rv}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{../matlab scripts/lab2/results/kalmanWrongRn.png}
+    \includegraphics[width=0.9\textwidth]{pic/lab2/kalmanWrongRn_am.png}
     \caption{State estimation comparison with $R_n = 100 R_{n_{\text{true}}}$}
     \label{fig:state_estimation_wrong_Rn}
 \end{figure}
 
 
 \section{Conclusions}
+\label{sec:conclusions}
 
 \subsection{Which method performs better?}
 
 Method b (the Kalman filter) performs better. 
-In the experiments run from matlab the Kalman filter produces much smaller state estimation error and converges to the true state independent of the initial condition, 
+In the experiments run from Matlab, the Kalman filter produces much smaller state estimation error and converges to the true state independent of the initial condition, 
 whereas the open‑loop prediction remains biased and has larger steady‑state error. 
 (The Kalman filter estimation reduced the error by a margin of tens of dB relative to the open‑loop prediction.)
 
@@ -222,11 +246,11 @@ it adapts its estimates using incoming measurements and reduces bias that the pr
 However, the Kalman filter is sensitive to model mismatch and to incorrect tuning of the noise covariances: 
 large model errors degrade its performance (but it still outperforms the naive predictor in every single test we ran). 
 
-In short, Kalman = more robust to noise and initial state, but still requires a reasonably accurate model and sensible covariance tuning.
+In short, Kalman = more robust to noise and wrong initial state, but still requires a reasonably accurate model and sensible covariance tuning.
 
 \subsection{Is there a difference in performance between the estimate of the first state (capacitor voltage) and of the second state (current) for method a? And for method b? Why?}
 
-Yes, the Kalman estimator has a lower error on the first state ($V_C$) compared to the simple prediction. It can be explained by the fact that the feedback provided by the Kalman estimator corrects the state estimate but only the first state is measured. This gives more uncertainty on the second state and therefore a higher estimation error.
+Yes, the Kalman estimator has a lower error on the first state ($V_C$) compared to the simple prediction. It can be explained by the fact that the feedback provided by the Kalman estimator corrects the state estimate but only the first state, which is measured. This gives more uncertainty on the second state and therefore a higher estimation error.
 
 
 \subsection{What are the effects of the covariance matrices on the Kalman gain?}
@@ -248,6 +272,6 @@ Intuitively:
 \begin{itemize}
     \item Increasing the measurement noise \(R_n\) makes the denominator larger and therefore reduces \(K\): the filter gives more trust to the model-based prediction and less on the measurements.
     \item Increasing the process noise covariance \(R_v\) increases \(Q\) and hence increases \(K\).
-    \item Th initial state covariance \(P\) affects the transient gains.
+    \item The initial state covariance \(P\) affects the transient gains.
 \end{itemize}
 Edge cases: as \(R_n\to 0\) the gain tends to the (pseudo‑)inverse, while as \(R_n\to\infty\) the gain tends to zero and the filter behaves like a simple predictor.

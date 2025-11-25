@@ -15,7 +15,7 @@ poles = eig(Ac);
 disp('Poles of the continuous-time system:');
 disp(poles);
 
-fs = 4e6;
+fs = 12.9e6;
 Ts = 1/fs;
 
 sysDiscreteTustin = c2d(sysContinuous, 1/fs, 'tustin');
